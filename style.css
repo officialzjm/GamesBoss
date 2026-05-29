@@ -988,7 +988,7 @@ body.fullscreen-mode #game-container {
 }
 
 body.fullscreen-mode #game,
-body.fullscreen-mode #game > div,
+body.fullscreen-mode #game > .ejs_game,
 body.fullscreen-mode #game .ejs_player {
     width: 100% !important;
     height: 100% !important;
@@ -1001,13 +1001,19 @@ body.fullscreen-mode #game .ejs_player {
 
 /* Hide EmulatorJS menu chrome in play mode. The translucent rounded bars on
    mobile are the small-screen menu, and they can sit over the gamepad taps. */
-body.fullscreen-mode #game .ejs_menu_bar,
-body.fullscreen-mode #game .ejs_top_bar,
-body.fullscreen-mode #game .ejs_message,
-body.fullscreen-mode #game .ejs_settings_parent,
-body.fullscreen-mode #game .ejs_context_menu,
-body.fullscreen-mode #game .ejs_popup_container {
+body.system-gba #game .ejs_menu_bar,
+body.system-gba #game .ejs_menu_bar *,
+body.system-gba #game .ejs_top_bar,
+body.system-gba #game .ejs_message,
+body.system-gba #game .ejs_settings_parent,
+body.system-gba #game .ejs_context_menu,
+body.system-gba #game .ejs_context_menu *,
+body.system-gba #game .ejs_popup_container,
+body.system-gba #game .ejs_virtualGamepad_open {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 body.fullscreen-mode #game canvas {

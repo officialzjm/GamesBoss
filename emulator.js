@@ -170,6 +170,37 @@ class EmulatorManager {
         window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
         window.EJS_startOnLoaded = true;
         window.EJS_color = '#58a6ff';
+        window.EJS_Buttons = {
+            playPause: false,
+            restart: false,
+            mute: false,
+            settings: false,
+            fullscreen: false,
+            saveState: false,
+            loadState: false,
+            saveSavFiles: false,
+            loadSavFiles: false,
+            gamepad: false,
+            cheat: false,
+            cacheManager: false,
+            netplay: false,
+            diskButton: false,
+            volumeSlider: false,
+            exitEmulation: false,
+            quickSave: false,
+            quickLoad: false,
+            screenshot: false,
+            screenRecord: false
+        };
+        window.EJS_VirtualGamepadSettings = [
+            { type: 'button', text: 'B', id: 'b', location: 'right', left: 10, top: 70, bold: true, input_value: 0 },
+            { type: 'button', text: 'A', id: 'a', location: 'right', left: 81, top: 40, bold: true, input_value: 8 },
+            { type: 'dpad', id: 'dpad', location: 'left', left: '50%', top: '50%', joystickInput: false, inputValues: [4, 5, 6, 7] },
+            { type: 'button', text: 'Select', id: 'select', location: 'center', left: -5, fontSize: 15, block: true, input_value: 2 },
+            { type: 'button', text: 'Start', id: 'start', location: 'center', left: 60, fontSize: 15, block: true, input_value: 3 },
+            { type: 'button', text: 'L', id: 'l', location: 'left', left: 3, top: -90, bold: true, block: true, input_value: 10 },
+            { type: 'button', text: 'R', id: 'r', location: 'right', right: 3, top: -90, bold: true, block: true, input_value: 11 }
+        ];
 
         // Tear down any previous EmulatorJS instance
         if (window.EJS_emulator) {
