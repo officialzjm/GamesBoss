@@ -419,24 +419,50 @@ input[type="file"]::file-selector-button {
 .modal-content::-webkit-scrollbar-thumb { background: #30363f; border-radius: 999px; }
 
 /* -------------------------------------------------------------
-   NES Touch Controls — INLINE block, sits below the game screen.
-   No absolute positioning, no overlays, can't block any other UI.
+   Touch Pad (NES + GBA) — INLINE below game, portrait-friendly.
+   Layout: shoulders row (GBA only) on top, then main row with
+   D-pad | SELECT/START | A/B
    ------------------------------------------------------------- */
 .touch-controls {
-    display: none; /* set to grid by JS show() when NES + touch device */
+    display: none; /* set to grid by JS show() on touch devices */
     margin-top: 14px;
     padding: 14px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--line);
     background: rgba(15, 17, 19, 0.6);
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    justify-items: center;
-    gap: 14px;
+    grid-template-columns: 1fr;
+    gap: 12px;
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
     touch-action: none;
+}
+
+/* Shoulder row — only shown when GBA is active (body.is-gba toggled by JS) */
+.touch-shoulders {
+    display: none;
+    justify-content: space-between;
+    gap: 12px;
+}
+body.is-gba .touch-shoulders { display: flex; }
+
+.shoulder-l,
+.shoulder-r {
+    flex: 1;
+    max-width: 140px;
+    height: 38px;
+    border-radius: 12px 12px 4px 4px;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+}
+
+/* Main row: D-pad | Select+Start | A/B */
+.touch-main {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    justify-items: center;
+    gap: 14px;
 }
 
 .touch-dpad {
