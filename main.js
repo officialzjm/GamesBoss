@@ -27,16 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
                          || ('ontouchstart' in window);
 
     function syncTouchOverlay() {
-        // Inline touch pad — always shown on touch devices for BOTH NES and GBA.
-        // Lives BELOW the game screen (portrait-friendly layout).
+        // Inline NES touch controls — shown only on touch devices with NES selected.
+        // No fullscreen requirement; they live below the game screen.
         if (!touchControls.container) return;
-        const shouldShow = isTouchDevice;
+        const shouldShow = isTouchDevice && emulator.currentSystem === 'nes';
         if (shouldShow) touchControls.show();
         else touchControls.hide();
-
-        // Toggle a body class so CSS can show/hide GBA-only buttons (L/R)
-        document.body.classList.toggle('is-gba', emulator.currentSystem === 'gba');
-        document.body.classList.toggle('is-nes', emulator.currentSystem === 'nes');
     }
     window.__syncTouchOverlay = syncTouchOverlay;
 

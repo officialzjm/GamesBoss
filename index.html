@@ -68,30 +68,22 @@
                 </div>
             </div>
 
-            <!-- Touch pad (NES + GBA) — auto-shown on touch devices. Sits BELOW the screen, always visible. -->
+            <!-- NES touch controls (inline, BELOW the screen — auto-shown on touch devices when NES is selected) -->
             <div id="touchControls" class="touch-controls" style="display:none;">
-                <!-- Shoulder buttons row (L / R) — GBA only -->
-                <div class="touch-shoulders" data-gba-only>
-                    <button class="touch-btn shoulder-l" data-touch-button="L" aria-label="L">L</button>
-                    <button class="touch-btn shoulder-r" data-touch-button="R" aria-label="R">R</button>
+                <div class="touch-dpad">
+                    <button class="touch-btn dpad-up"    data-touch-button="UP"    aria-label="Up">&#9650;</button>
+                    <button class="touch-btn dpad-left"  data-touch-button="LEFT"  aria-label="Left">&#9664;</button>
+                    <button class="touch-btn dpad-right" data-touch-button="RIGHT" aria-label="Right">&#9654;</button>
+                    <button class="touch-btn dpad-down"  data-touch-button="DOWN"  aria-label="Down">&#9660;</button>
+                    <span class="dpad-center" aria-hidden="true"></span>
                 </div>
-                <!-- Main row: D-pad | Select+Start | A/B -->
-                <div class="touch-main">
-                    <div class="touch-dpad">
-                        <button class="touch-btn dpad-up"    data-touch-button="UP"    aria-label="Up">&#9650;</button>
-                        <button class="touch-btn dpad-left"  data-touch-button="LEFT"  aria-label="Left">&#9664;</button>
-                        <button class="touch-btn dpad-right" data-touch-button="RIGHT" aria-label="Right">&#9654;</button>
-                        <button class="touch-btn dpad-down"  data-touch-button="DOWN"  aria-label="Down">&#9660;</button>
-                        <span class="dpad-center" aria-hidden="true"></span>
-                    </div>
-                    <div class="touch-system">
-                        <button class="touch-btn system-select" data-touch-button="SELECT" aria-label="Select">SELECT</button>
-                        <button class="touch-btn system-start"  data-touch-button="START"  aria-label="Start">START</button>
-                    </div>
-                    <div class="touch-actions">
-                        <button class="touch-btn action-b" data-touch-button="B" aria-label="B">B</button>
-                        <button class="touch-btn action-a" data-touch-button="A" aria-label="A">A</button>
-                    </div>
+                <div class="touch-system">
+                    <button class="touch-btn system-select" data-touch-button="SELECT" aria-label="Select">SELECT</button>
+                    <button class="touch-btn system-start"  data-touch-button="START"  aria-label="Start">START</button>
+                </div>
+                <div class="touch-actions">
+                    <button class="touch-btn action-b" data-touch-button="B" aria-label="B">B</button>
+                    <button class="touch-btn action-a" data-touch-button="A" aria-label="A">A</button>
                 </div>
             </div>
 

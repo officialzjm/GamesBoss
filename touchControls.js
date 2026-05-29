@@ -1,6 +1,7 @@
-// Touch Controls Overlay — drives NES (jsNES) AND GBA (EmulatorJS) input
-// Multi-touch aware: each touch is tracked by identifier so D-pad + A/B
-// can be held simultaneously. Buttons can also be slid into / out of.
+// Touch Controls Overlay for NES (jsNES has no built-in touch input)
+// Multi-touch aware: tracks each touch by identifier so D-pad + A/B can be held together.
+// Uses the InputHandler.handleButtonDown/Up pipeline so all existing button logic
+// (jsNES.buttonDown, etc.) is reused.
 
 class TouchControls {
     constructor(emulatorManager, inputHandler) {
@@ -9,17 +10,12 @@ class TouchControls {
         this.container = document.getElementById('touchControls');
         if (!this.container) return;
 
-        // EmulatorJS GBA button IDs (player 1) used by simulateInput()
-        // https://emulatorjs.org/docs/customizing#button-codes
-        this.GBA_BUTTON_IDS = {
-            A: 0, B: 1, SELECT: 2, START: 3,
-            RIGHT: 4, LEFT: 5, UP: 6, DOWN: 7,
-            R: 8, L: 9
-        };
-
-        // Track touches: touch id -> Set of button names currently held by that touch
+        // Map of touch identifier -> Set of pressed button names
+        // (one touch can drag across multiple buttons; we track entry/exit)
         this.activeTouches = new Map();
-        // Reference-count button presses (in case multiple touches hold the same)
+
+        // Map of currently pressed button names -> count of touches holding it.
+        // Lets multiple touches hold the same button safely.
         this.pressedButtons = new Map();
 
         this.buttons = Array.from(this.container.querySelectorAll('[data-touch-button]'));
@@ -27,8 +23,10 @@ class TouchControls {
     }
 
     _init() {
+        // Disable browser default behaviors (scroll/zoom/select) inside the overlay
         this.container.addEventListener('contextmenu', (e) => e.preventDefault());
 
+        // Use Pointer Events when available, fall back to Touch Events for older mobile Safari
         if (window.PointerEvent) {
             this.container.addEventListener('pointerdown',   (e) => this._onPointerDown(e),   { passive: false });
             this.container.addEventListener('pointermove',   (e) => this._onPointerMove(e),   { passive: false });
@@ -42,12 +40,14 @@ class TouchControls {
             this.container.addEventListener('touchcancel', (e) => this._onTouchEnd(e),    { passive: false });
         }
 
+        // Release everything if user backgrounds the tab
         window.addEventListener('blur', () => this.releaseAll());
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) this.releaseAll();
         });
     }
 
+    // Return the button name (e.g. 'A', 'UP') under x,y, or null
     _buttonAt(x, y) {
         const els = document.elementsFromPoint(x, y);
         for (const el of els) {
@@ -64,7 +64,10 @@ class TouchControls {
         this.pressedButtons.set(buttonName, count);
         if (count === 1) {
             this._setVisualPressed(buttonName, true);
-            this._dispatchDown(buttonName);
+            const code = this.inputHandler.BUTTON[buttonName];
+            if (code !== undefined) {
+                this.inputHandler.handleButtonDown(code);
+            }
         }
     }
 
@@ -74,51 +77,12 @@ class TouchControls {
         if (count <= 0) {
             this.pressedButtons.delete(buttonName);
             this._setVisualPressed(buttonName, false);
-            this._dispatchUp(buttonName);
+            const code = this.inputHandler.BUTTON[buttonName];
+            if (code !== undefined) {
+                this.inputHandler.handleButtonUp(code);
+            }
         } else {
             this.pressedButtons.set(buttonName, count);
-        }
-    }
-
-    // Send "button down" to whichever emulator is currently active
-    _dispatchDown(buttonName) {
-        const system = this.emulator.currentSystem;
-        if (system === 'nes') {
-            const code = this.inputHandler.BUTTON[buttonName];
-            if (code !== undefined) this.inputHandler.handleButtonDown(code);
-        } else if (system === 'gba') {
-            this._gbaButton(buttonName, 1);
-        }
-    }
-
-    _dispatchUp(buttonName) {
-        const system = this.emulator.currentSystem;
-        if (system === 'nes') {
-            const code = this.inputHandler.BUTTON[buttonName];
-            if (code !== undefined) this.inputHandler.handleButtonUp(code);
-        } else if (system === 'gba') {
-            this._gbaButton(buttonName, 0);
-        }
-    }
-
-    // value: 1 = pressed, 0 = released
-    _gbaButton(buttonName, value) {
-        const ejs = window.EJS_emulator;
-        const id = this.GBA_BUTTON_IDS[buttonName];
-        if (id === undefined) return;
-        try {
-            // Newer EmulatorJS: gameManager.functions.simulateInput(player, btn, value)
-            if (ejs && ejs.gameManager && ejs.gameManager.functions && ejs.gameManager.functions.simulateInput) {
-                ejs.gameManager.functions.simulateInput(0, id, value);
-                return;
-            }
-            // Older / alt API: gameManager.simulateInput(player, btn, value)
-            if (ejs && ejs.gameManager && typeof ejs.gameManager.simulateInput === 'function') {
-                ejs.gameManager.simulateInput(0, id, value);
-                return;
-            }
-        } catch (err) {
-            console.warn('GBA touch input failed:', err);
         }
     }
 
@@ -134,6 +98,7 @@ class TouchControls {
         if (!btn) return;
         this.activeTouches.set(e.pointerId, new Set([btn]));
         this._press(btn);
+        // capture so move events keep firing even outside the original target
         try { e.target.setPointerCapture(e.pointerId); } catch (_) {}
     }
 
@@ -143,6 +108,7 @@ class TouchControls {
         const newBtn = this._buttonAt(e.clientX, e.clientY);
         const held = this.activeTouches.get(e.pointerId);
 
+        // Released anything not under finger anymore (allows slide-off)
         for (const b of held) {
             if (b !== newBtn) {
                 this._release(b);
@@ -208,6 +174,7 @@ class TouchControls {
             for (const b of held) this._release(b);
         }
         this.activeTouches.clear();
+        // Failsafe — clear any visual leftovers
         for (const el of this.buttons) el.classList.remove('is-pressed');
         this.pressedButtons.clear();
     }
