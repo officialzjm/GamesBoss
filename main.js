@@ -26,11 +26,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const isTouchDevice = (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches)
                          || ('ontouchstart' in window);
 
+    function syncSystemClass() {
+        const system = systemSelect.value || emulator.currentSystem;
+        document.body.classList.toggle('is-nes', system === 'nes');
+        document.body.classList.toggle('is-gba', system === 'gba');
+        document.body.classList.toggle('system-nes', system === 'nes');
+        document.body.classList.toggle('system-gba', system === 'gba');
+    }
+
     function syncTouchOverlay() {
         // Inline NES touch controls — shown only on touch devices with NES selected.
         // No fullscreen requirement; they live below the game screen.
         if (!touchControls.container) return;
-        const shouldShow = isTouchDevice && emulator.currentSystem === 'nes';
+        syncSystemClass();
+        const shouldShow = isTouchDevice && (systemSelect.value || emulator.currentSystem) === 'nes';
         if (shouldShow) touchControls.show();
         else touchControls.hide();
     }
@@ -89,5 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Initial sync
+    syncSystemClass();
     syncTouchOverlay();
 });

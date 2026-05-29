@@ -439,6 +439,13 @@ input[type="file"]::file-selector-button {
     touch-action: none;
 }
 
+body.is-gba #touchControls,
+body.system-gba #touchControls {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
 .touch-dpad {
     position: relative;
     width: 150px;
