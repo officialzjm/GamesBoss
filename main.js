@@ -123,6 +123,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     */
+    async function exportState() {
+        const romUrl = params.get("rom");
+        const fileName = romUrl.split("/").pop() || "game.gba";
+        
+        const state = await window.EJS_emulator.storage.states.get(fileName);
+    
+        const blob = new Blob([state], {
+            type: "application/octet-stream"
+        });
+    
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = key;
+        a.click();
+    
+        URL.revokeObjectURL(a.href);
+    }
+    async function importState(file) {
+        const romUrl = params.get("rom");
+        const fileName = romUrl.split("/").pop() || "game.gba";
+        
+        const state = await window.EJS_emulator.storage.states.get(fileName);
+    
+        const data = new Uint8Array(await file.arrayBuffer());
+    
+        await window.EJS_emulator.storage.states.put(
+            fileName,
+            data
+        );
+    
+        alert("State imported");
+    }
     // Canvas focus helper for keyboard input
     canvas.setAttribute('tabindex', '0');
     canvas.addEventListener('keydown', (e) => e.preventDefault());
