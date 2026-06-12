@@ -2,174 +2,108 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <meta name="description" content="Browser-based NES and GBA emulator using jsNES, EmulatorJS/mGBA, and an optional IodineGBA fallback. Upload legally owned ROMs and play on desktop or mobile.">
-    <meta name="keywords" content="browser emulator, NES emulator, GBA emulator, retro gaming, JavaScript emulator, HTML5 Canvas, WebAssembly, jsNES, EmulatorJS, mGBA, IodineGBA, GitHub Pages">
-    <meta name="license" content="GPL-3.0">
-    <meta property="og:title" content="Retro Emulator - NES & GBA">
-    <meta property="og:description" content="Play legally owned NES and GBA ROMs in the browser with jsNES, EmulatorJS/mGBA, and an optional IodineGBA fallback.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://x1n-q.github.io/Web-Based-Emulator/">
-    <meta name="theme-color" content="#0f1113">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Retro Emulator - NES & GBA</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>Emulator</title>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: black;
+        }
+
+        #screen {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: black;
+        }
+
+        #canvas,
+        #game-container,
+        #game {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        #canvas {
+            image-rendering: pixelated;
+        }
+
+        /* Hide everything else */
+        #status,
+        #debug,
+        #touchControls,
+        #gbaSaveHint,
+        #fileProtocolWarning,
+        #controlModal {
+            display: none !important;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
-    <main class="app-shell">
-        <header class="app-header">
-            <p class="eyebrow">Browser Emulator</p>
-            <h1>Retro Emulator</h1>
-            <p class="app-subtitle hide-on-mobile">A cleaner local setup for running NES and GBA ROMs directly in the browser.</p>
-        </header>
 
-        <div id="fileProtocolWarning" class="warning-banner" style="display:none;">
-            <strong>WARNING:</strong> You're opening this file directly (`file://`).<br>
-            Please use a web server instead:<br>
-            <code>python -m http.server 8000</code><br>
-            Then open: <code>http://localhost:8000</code>
-        </div>
+    <!-- Emulator Display -->
+    <div id="screen">
+        <canvas id="canvas" width="256" height="240"></canvas>
 
-        <!-- Compact top bar: system, ROM, settings -->
-        <div class="top-bar panel">
-            <div class="top-bar-row">
-                <div class="field-group field-grow">
-                    <label for="systemSelect">System</label>
-                    <div class="select-wrap">
-                        <select id="systemSelect">
-                            <option value="nes">Nintendo (NES)</option>
-                            <option value="gba">Game Boy Advance (GBA)</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="field-group field-grow">
-                    <label for="romFile">ROM File</label>
-                    <input type="file" id="romFile" accept=".nes,.gba">
-                </div>
-                <div class="field-group field-grow gba-engine-group" id="gbaEngineGroup" style="display:none;">
-                    <label for="gbaEngineSelect">GBA Engine</label>
-                    <div class="select-wrap">
-                        <select id="gbaEngineSelect">
-                            <option value="emulatorjs">EmulatorJS / mGBA (Recommended)</option>
-                            <option value="iodine">IodineGBA Standalone</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="field-group action-group">
-                    <label>&nbsp;</label>
-                    <div class="action-buttons">
-                        <button id="controlSettingsBtn" class="icon-btn" title="Configure controls" aria-label="Configure controls">
-                            <span aria-hidden="true">&#9881;</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stage / screen panel -->
-        <section class="stage-panel panel">
-            <div class="stage-header">
-                <div>
-                    <p class="eyebrow">Display</p>
-                    <h2>Game Screen</h2>
-                </div>
-                <span id="stageBadge" class="stage-badge">Local Runtime</span>
-            </div>
-            <div id="screen">
-                <canvas id="canvas" width="256" height="240"></canvas>
-                <div id="game-container" style="display:none;">
-                    <div id="game"></div>
-                </div>
-            </div>
-            <div id="gbaSaveHint" class="gba-save-hint" style="display:none;">
-                GBA saves are stored locally in this browser. Use Save State / Load State for progress after refresh, and Export Save File for backups or moving to another device.
-            </div>
-
-            <!-- NES touch controls (inline, BELOW the screen — auto-shown on touch devices when NES is selected) -->
-            <div id="touchControls" class="touch-controls" style="display:none;">
-                <div class="touch-dpad">
-                    <button class="touch-btn dpad-up"    data-touch-button="UP"    aria-label="Up">&#9650;</button>
-                    <button class="touch-btn dpad-left"  data-touch-button="LEFT"  aria-label="Left">&#9664;</button>
-                    <button class="touch-btn dpad-right" data-touch-button="RIGHT" aria-label="Right">&#9654;</button>
-                    <button class="touch-btn dpad-down"  data-touch-button="DOWN"  aria-label="Down">&#9660;</button>
-                    <span class="dpad-center" aria-hidden="true"></span>
-                </div>
-                <div class="touch-system">
-                    <button class="touch-btn system-select" data-touch-button="SELECT" aria-label="Select">SELECT</button>
-                    <button class="touch-btn system-start"  data-touch-button="START"  aria-label="Start">START</button>
-                </div>
-                <div class="touch-actions">
-                    <button class="touch-btn action-b" data-touch-button="B" aria-label="B">B</button>
-                    <button class="touch-btn action-a" data-touch-button="A" aria-label="A">A</button>
-                </div>
-            </div>
-
-            <div id="status">Select a system and load a ROM file to start</div>
-            <details class="dev-details">
-                <summary>Developer log</summary>
-                <div id="debug" class="debug"></div>
-            </details>
-        </section>
-
-        <section class="info-grid">
-            <div class="info panel">
-                <strong>Supported Systems</strong>
-                <p>NES runs on jsNES. GBA defaults to EmulatorJS (mGBA core). You can also switch to the standalone IodineGBA library from the GBA Engine selector.</p>
-            </div>
-            <div class="info panel">
-                <strong>Controls</strong>
-                <div class="control-summary">
-                    <div class="control-summary-item">
-                        <span class="system-chip">NES</span>
-                        <p>Keyboard: Arrows/WASD, Z/J/N (A), X/K/M (B), Enter/Space (Start), Shift/C (Select). On phones, use the on-screen pad below the game.</p>
-                    </div>
-                    <div class="control-summary-item">
-                        <span class="system-chip">GBA</span>
-                        <p>EmulatorJS handles saves, controller mapping, touch controls, and fullscreen. IodineGBA is a fallback standalone player, so use its in-frame Game file picker.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Control Settings Modal -->
-    <div id="controlModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Configure Controls</h2>
-                <button class="close-btn" id="closeModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="control-group">
-                    <label>Select System:</label>
-                    <select id="controlSystemSelect">
-                        <option value="nes">NES</option>
-                        <option value="gba">GBA</option>
-                    </select>
-                </div>
-                <div id="controlMapping" class="control-mapping">
-                    <!-- Controls will be generated here -->
-                </div>
-                <div class="modal-actions">
-                    <button id="resetControls" class="btn-secondary">Reset to Default</button>
-                    <button id="saveControls" class="btn-primary">Save Controls</button>
-                </div>
-            </div>
+        <div id="game-container" style="display:none;">
+            <div id="game"></div>
         </div>
     </div>
 
-    <!-- Load jsNES library for NES emulation -->
+    <!-- Hidden elements required by main.js -->
+    <select id="systemSelect" class="hidden">
+        <option value="nes">NES</option>
+        <option value="gba" selected>GBA</option>
+    </select>
+
+    <select id="gbaEngineSelect" class="hidden">
+        <option value="emulatorjs" selected>EmulatorJS / mGBA</option>
+        <option value="iodine">IodineGBA</option>
+    </select>
+
+    <input type="file" id="romFile" class="hidden">
+    <button id="controlSettingsBtn" class="hidden"></button>
+
+    <div id="status" class="hidden"></div>
+    <div id="debug" class="hidden"></div>
+    <div id="gbaSaveHint" class="hidden"></div>
+    <div id="touchControls" class="hidden"></div>
+    <div id="fileProtocolWarning" class="hidden"></div>
+
+    <!-- Hidden modal elements expected by controlSettings.js -->
+    <div id="controlModal" class="hidden">
+        <button id="closeModal"></button>
+        <select id="controlSystemSelect">
+            <option value="nes">NES</option>
+            <option value="gba">GBA</option>
+        </select>
+        <div id="controlMapping"></div>
+        <button id="resetControls"></button>
+        <button id="saveControls"></button>
+    </div>
+
     <script src="https://unpkg.com/jsnes@1.2.1/dist/jsnes.min.js"></script>
 
-    <!-- Load our modules -->
     <script src="emulator.js"></script>
     <script src="controls.js"></script>
     <script src="touchControls.js"></script>
     <script src="controlSettings.js"></script>
-
-    <!-- Main application -->
     <script src="main.js"></script>
+
 </body>
 </html>
