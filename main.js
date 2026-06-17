@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     function launchGame(romLocation) {
-        const system = game.rom.split('.').pop();
+        const system = romLocation.split('.').pop();
         if (system == "gbc" || system == "gb") {
             system = "gba";
         }
