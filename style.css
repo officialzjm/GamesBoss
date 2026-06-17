@@ -938,3 +938,50 @@ body.system-gba #touchControls {
     .action-a, .action-b { width: 55px; height: 55px; font-size: 1.2rem; }
     .system-select, .system-start { min-width: 64px; height: 28px; font-size: 0.62rem; }
 }
+.game-selector {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.game-selector h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#gameSearch {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+#gameList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+.game-card {
+    background: #1f2937;
+    border: 1px solid #374151;
+    color: white;
+    padding: 18px;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform .15s ease,
+                background .15s ease;
+}
+
+.game-card:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+}
+
+.game-card:active {
+    transform: translateY(0);
+}
