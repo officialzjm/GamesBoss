@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
             rom: "roms/pokemonleafgreen.gba"
         }
     ];
-    console.log('stage two');
+    console.log('stage two.1');
     // Initial sync
     syncSystemClass();
     syncTouchOverlay();
