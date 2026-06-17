@@ -1,22 +1,72 @@
 // Main Application Entry Point
 const GAMES = [
     {
-        id: "pokemonemerald",
-        title: "Pokemon Emerald",
-        system: "gba",
-        rom: "roms/pokemonemerald.gba"
+        title: "Pokémon Red",
+        rom: "roms/pokemon_red.gb"
     },
     {
-        id: "pokemonfirered",
-        title: "Pokemon Fire Red",
-        system: "gba",
-        rom: "roms/pokemonfirered.gba"
+        title: "Pokémon Blue",
+        rom: "roms/pokemon_blue.gb"
     },
     {
-        id: "pokemonleafgreen",
-        title: "Pokemon Leaf Green",
-        system: "gba",
-        rom: "roms/pokemonleafgreen.gba"
+        title: "Pokémon Yellow",
+        rom: "roms/pokemon_yellow.gbc"
+    },
+    {
+        title: "Pokémon Gold",
+        rom: "roms/pokemon_gold.gbc"
+    },
+    {
+        title: "Pokémon Silver",
+        rom: "roms/pokemon_silver.gbc"
+    },
+    {
+        title: "Pokémon Crystal",
+        rom: "roms/pokemon_crystal.gbc"
+    },
+    {
+        title: "Pokémon Ruby",
+        rom: "roms/pokemon_ruby.gba"
+    },
+    {
+        title: "Pokémon Sapphire",
+        rom: "roms/pokemon_sapphire.gba"
+    },
+    {
+        title: "Pokémon Emerald",
+        rom: "roms/pokemon_emerald.gba"
+    },
+    {
+        title: "Pokémon FireRed",
+        rom: "roms/pokemon_firered.gba"
+    },
+    {
+        title: "Pokémon LeafGreen",
+        rom: "roms/pokemon_leafgreen.gba"
+    },
+    {
+        title: "Pokémon Mystery Dungeon: Red Rescue Team",
+        rom: "roms/pokemon_red_rescue.gba"
+    },
+    {
+        title: "The Legend of Zelda: Link's Awakening DX",
+        rom: "roms/zelda_awakening_dx.gbc"
+    },
+    {
+        title: "The Legend of Zelda: Oracle of Seasons",
+        rom: "roms/zelda_oracle_seasons.gbc"
+    },
+    {
+        title: "The Legend of Zelda: Oracle of Ages",
+        rom: "roms/zelda_oracle_ages.gbc"
+    },
+    {
+        title: "The Legend of Zelda: A Link to the Past & Four Swords",
+        rom: "roms/zelda_past.gba"
+    },
+    {
+        title: "The Legend of Zelda: The Minish Cap",
+        rom: "roms/zelda_minish_cap.gba"
     }
 ];
 document.addEventListener('DOMContentLoaded', () => {
@@ -74,108 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     window.__syncTouchOverlay = syncTouchOverlay;
 
-    // -----------------------------------------------------------
-    // System selection
-    // -----------------------------------------------------------
-    /*
-    systemSelect.addEventListener('change', async (e) => {
-        const system = e.target.value;
-        emulator.setSystem(system);
-        status.textContent = `System: ${systemSelect.options[systemSelect.selectedIndex].text} - Load a ROM file`;
-        if (system === 'gba' && gbaEngineSelect && gbaEngineSelect.value === 'iodine') {
-            emulator.setGBAEngine('iodine');
-            emulator.loadGBA();
-        }
-        syncTouchOverlay();
-    });
-    
-    if (gbaEngineSelect) {
-        gbaEngineSelect.addEventListener('change', async (e) => {
-            emulator.setGBAEngine(e.target.value);
-            if (emulator.currentSystem !== 'gba') return;
-
-            const file = romFile.files && romFile.files[0];
-            if (emulator.gbaEngine === 'iodine' || file) {
-                status.textContent = 'Switching GBA engine...';
-                try {
-                    emulator.stop();
-                    await emulator.loadGBA(file);
-                } catch (err) {
-                    emulator.log('ERROR: ' + err.message);
-                    status.textContent = 'Error: ' + err.message;
-                    console.error(err);
-                }
-            } else {
-                emulator.setSystem('gba');
-                status.textContent = 'GBA engine changed - load a ROM file';
-            }
-            syncTouchOverlay();
-        });
-    }
-    */
-
-    // -----------------------------------------------------------
-    // ROM loader
-    // -----------------------------------------------------------
-    /*
-    romFile.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        status.textContent = 'Loading ROM...';
-        emulator.log('Reading ROM file...');
-
-        try {
-            emulator.stop();
-
-            if (emulator.currentSystem === 'nes') {
-                await emulator.loadNES(file);
-            } else if (emulator.currentSystem === 'gba') {
-                await emulator.loadGBA(file);
-            }
-
-            syncTouchOverlay();
-        } catch (err) {
-            emulator.log('ERROR: ' + err.message);
-            status.textContent = 'Error: ' + err.message;
-            console.error(err);
-        }
-    });
-    */
-    /* Never tested these functions, just noticed the downlaod feature hidden in settings :cry:
-    async function exportState() {
-        const romUrl = params.get("rom");
-        const fileName = romUrl.split("/").pop() || "game.gba";
-        
-        const state = await window.EJS_emulator.storage.states.get(fileName);
-    
-        const blob = new Blob([state], {
-            type: "application/octet-stream"
-        });
-    
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = key;
-        a.click();
-    
-        URL.revokeObjectURL(a.href);
-    }
-    async function importState(file) {
-        const romUrl = params.get("rom");
-        const fileName = romUrl.split("/").pop() || "game.gba";
-        
-        const state = await window.EJS_emulator.storage.states.get(fileName);
-    
-        const data = new Uint8Array(await file.arrayBuffer());
-    
-        await window.EJS_emulator.storage.states.put(
-            fileName,
-            data
-        );
-    
-        alert("State imported");
-    }
-    */
     // Canvas focus helper for keyboard input
     canvas.setAttribute('tabindex', '0');
     canvas.addEventListener('keydown', (e) => e.preventDefault());
@@ -230,8 +178,12 @@ document.addEventListener('DOMContentLoaded', () => {
           btn.addEventListener("click", () => launchGame(btn.dataset.rom));
         });
     }
-    function launchGame(romLocation) {    
-        window.location.search = `?system=gba&rom=${romLocation}`;//href?
+    function launchGame(romLocation) {
+        const system = game.rom.split('.').pop();
+        if (system == "gbc" || system == "gb") {
+            system = "gba";
+        }
+        window.location.search = `?system=${system}&rom=${romLocation}`;//href?
     }
     (async () => {
         const params = new URLSearchParams(window.location.search);
