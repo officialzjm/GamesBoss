@@ -172,14 +172,29 @@ document.addEventListener('DOMContentLoaded', () => {
         emulator.log('Emulator ready');
     }
     // Auto-load ROM from URL
-// Auto-load ROM from URL
+    function showGameSelector() {
+        document.body.innerHTML = `
+            <div class="game-selector">
+                <h1>Select Game</h1>
+    
+                <button onclick="
+                    location.href='?system=gba&rom=roms/pokemonemerald.gba'
+                ">
+                    Pokemon Emerald
+                </button>
+            </div>
+        `;
+    }
     (async () => {
         const params = new URLSearchParams(window.location.search);
     
         const romUrl = params.get("rom");
         const system = params.get("system");
     
-        if (!romUrl) return;
+        if (!romUrl) {
+            showGameSelector();
+            return;
+        }
     
         const MAX_RETRIES = 5;
         const RETRY_DELAY = 5000; // 5 seconds
@@ -234,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     })();
+    console.log('stage one');
     // Initial sync
     syncSystemClass();
     syncTouchOverlay();
