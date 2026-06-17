@@ -175,15 +175,45 @@ document.addEventListener('DOMContentLoaded', () => {
     function showGameSelector() {
         document.body.innerHTML = `
             <div class="game-selector">
-                <h1>Select Game</h1>
+                <h1>Games</h1>
     
-                <button onclick="
-                    location.href='?system=gba&rom=roms/pokemonemerald.gba'
-                ">
-                    Pokemon Emerald
-                </button>
+                <input
+                    id="gameSearch"
+                    type="text"
+                    placeholder="Search games..."
+                >
+    
+                <div id="gameList"></div>
             </div>
         `;
+    
+        const search = document.getElementById("gameSearch");
+    
+        search.addEventListener("input", () => {
+            renderGames(search.value);
+        });
+    
+        renderGames();
+    }
+    function renderGames(filter = "") {
+        const list = document.getElementById("gameList");
+    
+        const filtered = GAMES.filter(game =>
+            game.title.toLowerCase()
+                .includes(filter.toLowerCase())
+        );
+    
+        list.innerHTML = filtered.map(game => `
+            <button
+                class="game-card"
+                onclick="launchGame('${game.rom}')"
+            >
+                ${game.title}
+            </button>
+        `).join("");
+    }
+    function launchGame(romLocation) {    
+        window.location.search = `?system=gba&rom=${romLocation}`;//href?
     }
     (async () => {
         const params = new URLSearchParams(window.location.search);
@@ -249,7 +279,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     })();
-    console.log('stage one');
+    const GAMES = [
+        {
+            id: "pokemonemerald",
+            title: "Pokemon Emerald",
+            system: "gba",
+            rom: "roms/pokemonemerald.gba"
+        },
+        {
+            id: "pokemonfirered",
+            title: "Pokemon Fire Red",
+            system: "gba",
+            rom: "roms/pokemonfirered.gba"
+        },
+        {
+            id: "pokemonleafgreen",
+            title: "Pokemon Leaf Green",
+            system: "gba",
+            rom: "roms/pokemonleafgreen.gba"
+        }
+    ];
+    console.log('stage two');
     // Initial sync
     syncSystemClass();
     syncTouchOverlay();
